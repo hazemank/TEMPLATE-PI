@@ -13,11 +13,11 @@
         @for (club of clubs; track club.id) {
         <div class="flex flex-col overflow-hidden rounded-lg border border-border bg-card sm:flex-row">
             <div class="relative aspect-video sm:aspect-auto sm:w-64 lg:w-80 h-48 sm:h-auto">
-                <img [src]="club.image" [alt]="club.title" class="object-cover h-full w-full" />
+                <img [src]="club.image" [alt]="club.name" class="object-cover h-full w-full" />
             </div>
             <div class="flex flex-1 flex-col gap-2 p-5">
                 <h3 class="text-base font-bold text-foreground">
-                    {{ club.icon }} {{ club.title }}
+                    {{ club.icon }} {{ club.name }}
                 </h3>
                 <p class="text-sm leading-relaxed text-muted-foreground">
                     {{ club.description }}

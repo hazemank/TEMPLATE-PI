@@ -1,7 +1,8 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, OnInit, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import { LucideAngularModule, Play, ChevronDown, ChevronRight, Square, CheckSquare } from 'lucide-angular';
+import { DataService, Training } from '../services/data.service';
 
 @Component({
   selector: 'app-training-detail',
@@ -10,45 +11,23 @@ import { LucideAngularModule, Play, ChevronDown, ChevronRight, Square, CheckSqua
   templateUrl: './training-detail.component.html',
 })
 export class TrainingDetailComponent implements OnInit {
+  private dataService = inject(DataService);
+  private route = inject(ActivatedRoute);
+
   readonly PlayIcon = Play;
   readonly ChevronDownIcon = ChevronDown;
   readonly ChevronRightIcon = ChevronRight;
   readonly SquareIcon = Square;
   readonly CheckSquareIcon = CheckSquare;
 
-  trainingData: Record<string, any> = {
-    "speak-fluent-english": {
-      title: "English for adults",
-      banner: "/images/course-banner.jpg",
-      chapters: [
-        {
-          name: "Chapter Name",
-          number: 1,
-          sections: [
-            { name: "Section name", completed: false },
-            { name: "Section name", completed: false },
-            { name: "Section name", completed: true },
-            { name: "Resume du chapitre", completed: false },
-            { name: "Quiz", completed: false },
-          ],
-        },
-        { name: "Web Development", number: 2, sections: [] },
-        { name: "Digital Marketing", number: 3, sections: [] },
-        { name: "Chapter Title", number: 4, sections: [] },
-        { name: "Long chapter title", number: 5, sections: [] },
-      ],
-    },
-  };
-
-  training = signal<any>(null);
+  training = signal<Training | null>(null);
   expandedChapter = signal<number>(0);
-
-  constructor(private route: ActivatedRoute) { }
 
   ngOnInit() {
     this.route.params.subscribe(params => {
       const slug = params['slug'];
-      this.training.set(this.trainingData[slug] || this.trainingData['speak-fluent-english']);
+      const found = this.dataService.trainings().find(t => t.slug === slug);
+      this.training.set(found || this.dataService.trainings()[0]);
     });
   }
 

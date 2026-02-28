@@ -1,8 +1,9 @@
-import { Component, signal } from '@angular/core';
+import { Component, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { LucideAngularModule, ArrowRight } from 'lucide-angular';
 import { PaginationComponent } from '../components/ui/pagination.component';
+import { DataService } from '../services/data.service';
 
 @Component({
   selector: 'app-clubs',
@@ -11,42 +12,12 @@ import { PaginationComponent } from '../components/ui/pagination.component';
   templateUrl: './clubs.component.html',
 })
 export class ClubsComponent {
+  data = inject(DataService);
   readonly ArrowRightIcon = ArrowRight;
 
-  clubs = [
-    {
-      id: 1,
-      title: "English Conversation Club",
-      icon: "💬",
-      description: "Practice speaking with peers in a fun and supportive environment through interactive discussions.",
-      image: "/images/club-1.jpg",
-      slug: "english-conversation-club",
-    },
-    {
-      id: 2,
-      title: "Book & Storytelling Club",
-      icon: "📚",
-      description: "Improve reading skills and vocabulary by exploring books, short stories, and creative storytelling.",
-      image: "/images/training-1.jpg",
-      slug: "book-storytelling-club",
-    },
-    {
-      id: 3,
-      title: "Drama & Roleplay Club",
-      icon: "🎭",
-      description: "Boost confidence and pronunciation by acting out real-life scenarios and fun roleplays.",
-      image: "/images/training-2.jpg",
-      slug: "drama-roleplay-club",
-    },
-    {
-      id: 4,
-      title: "Writing & Grammar Club",
-      icon: "✍️",
-      description: "Enhance your writing skills with engaging exercises, feedback, and grammar tips.",
-      image: "/images/training-3.jpg",
-      slug: "writing-grammar-club",
-    },
-  ];
+  get clubs() {
+    return this.data.clubs();
+  }
 
   currentPage = signal(1);
 

@@ -23,6 +23,9 @@ export class NavbarComponent {
     { href: '/trainings', label: 'Training' },
     { href: '/clubs', label: 'Clubs' },
     { href: '/events', label: 'Events' },
+    { href: '/competitions', label: 'Competitions' },
+    { href: '/classes', label: 'Classes' },
+    { href: '/admin', label: 'Admin' },
   ];
 
   constructor(public router: Router) { }
