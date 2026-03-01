@@ -49,6 +49,22 @@ export interface PlatformEvent {
     album?: string[];
 }
 
+export interface Participant {
+    id: number | string;
+    name: string;
+    email: string;
+    registeredAt: string;
+    score?: number;
+    status: 'registered' | 'disqualified' | 'winner';
+}
+
+export interface CompetitionRound {
+    name: string;
+    startDate: string;
+    endDate: string;
+    status: 'pending' | 'active' | 'done';
+}
+
 export interface Competition {
     id: number | string;
     title: string;
@@ -59,6 +75,30 @@ export interface Competition {
     deadline: string;
     prize: string;
     category: string;
+    tags?: string[];
+    maxParticipants?: number;
+    participants?: Participant[];
+    rounds?: CompetitionRound[];
+    rules?: string;
+    resultsPublished?: boolean;
+}
+
+export interface AttendanceRecord {
+    date: string;          // ISO date string e.g. "2025-03-03"
+    attendees: (number | string)[];  // list of enrolled student ids who attended
+}
+
+export interface EnrolledStudent {
+    id: number | string;
+    name: string;
+    email: string;
+    enrolledAt: string;
+}
+
+export interface ClassMaterial {
+    title: string;
+    url: string;
+    type: 'pdf' | 'video' | 'link' | 'slide';
 }
 
 export interface PlatformClass {
@@ -71,6 +111,13 @@ export interface PlatformClass {
     level: string;
     type: string;
     link?: string;
+    status: 'active' | 'cancelled' | 'full';
+    maxCapacity?: number;
+    enrolled?: EnrolledStudent[];
+    attendance?: AttendanceRecord[];
+    materials?: ClassMaterial[];
+    recurring?: boolean;
+    notes?: string;
 }
 
 @Injectable({
@@ -265,7 +312,21 @@ export class DataService {
             status: 'upcoming',
             deadline: "Oct 15, 2025",
             prize: "$5,000 + Scholarship",
-            category: "Speaking"
+            category: "Speaking",
+            tags: ["public speaking", "fluency", "confidence"],
+            maxParticipants: 100,
+            rules: "1. Participants must submit a 3-minute video.\n2. Topic must be related to global communication.\n3. Only one submission per participant.",
+            resultsPublished: false,
+            rounds: [
+                { name: "Submission Phase", startDate: "Sep 1, 2025", endDate: "Oct 15, 2025", status: 'active' },
+                { name: "Semi-Finals", startDate: "Oct 20, 2025", endDate: "Oct 25, 2025", status: 'pending' },
+                { name: "Grand Finals", startDate: "Nov 1, 2025", endDate: "Nov 1, 2025", status: 'pending' }
+            ],
+            participants: [
+                { id: 201, name: "Sarah Al-Amin", email: "sarah@example.com", registeredAt: "2025-09-02", score: 88, status: 'registered' },
+                { id: 202, name: "James Okafor", email: "james@example.com", registeredAt: "2025-09-04", score: 94, status: 'winner' },
+                { id: 203, name: "Mei Lin", email: "mei@example.com", registeredAt: "2025-09-05", score: 72, status: 'registered' }
+            ]
         },
         {
             id: 2,
@@ -276,7 +337,19 @@ export class DataService {
             status: 'ongoing',
             deadline: "Aug 30, 2025",
             prize: "MacBook Pro + Publishing Deal",
-            category: "Writing"
+            category: "Writing",
+            tags: ["creative writing", "storytelling", "fiction"],
+            maxParticipants: 50,
+            rules: "1. Stories must be 500–1500 words.\n2. Original work only.\n3. Must be submitted in English.",
+            resultsPublished: false,
+            rounds: [
+                { name: "Open Submissions", startDate: "Jul 1, 2025", endDate: "Aug 30, 2025", status: 'active' },
+                { name: "Judging", startDate: "Sep 1, 2025", endDate: "Sep 15, 2025", status: 'pending' }
+            ],
+            participants: [
+                { id: 301, name: "Carlos Rivera", email: "carlos@example.com", registeredAt: "2025-07-10", status: 'registered' },
+                { id: 302, name: "Amina Nour", email: "amina@example.com", registeredAt: "2025-07-15", score: 81, status: 'registered' }
+            ]
         }
     ]);
 
@@ -290,7 +363,23 @@ export class DataService {
             duration: "2 hours",
             level: "C1",
             type: "Live Class",
-            link: "https://zoom.us/j/123456789"
+            link: "https://zoom.us/j/123456789",
+            status: 'active',
+            maxCapacity: 20,
+            recurring: true,
+            notes: "Focus on email writing and presentation skills this month.",
+            enrolled: [
+                { id: 101, name: "Alice Martin", email: "alice@example.com", enrolledAt: "2025-09-01" },
+                { id: 102, name: "Bob Chen", email: "bob@example.com", enrolledAt: "2025-09-02" }
+            ],
+            attendance: [
+                { date: "2025-09-08", attendees: [101, 102] },
+                { date: "2025-09-15", attendees: [101] }
+            ],
+            materials: [
+                { title: "Business Email Guide", url: "/materials/email-guide.pdf", type: "pdf" },
+                { title: "Week 1 Slides", url: "/materials/week1-slides.pdf", type: "slide" }
+            ]
         },
         {
             id: 2,
@@ -301,7 +390,17 @@ export class DataService {
             duration: "1.5 hours",
             level: "A2/B1",
             type: "Workshop",
-            link: "https://zoom.us/j/987654321"
+            link: "https://zoom.us/j/987654321",
+            status: 'active',
+            maxCapacity: 15,
+            recurring: true,
+            enrolled: [
+                { id: 103, name: "Fatima Zahra", email: "fatima@example.com", enrolledAt: "2025-09-03" }
+            ],
+            attendance: [],
+            materials: [
+                { title: "Grammar Handbook", url: "/materials/grammar.pdf", type: "pdf" }
+            ]
         },
         {
             id: 3,
@@ -312,7 +411,13 @@ export class DataService {
             duration: "1.5 hours",
             level: "All Levels",
             type: "Masterclass",
-            link: "https://zoom.us/j/555666777"
+            link: "https://zoom.us/j/555666777",
+            status: 'full',
+            maxCapacity: 10,
+            recurring: false,
+            enrolled: [],
+            attendance: [],
+            materials: []
         }
     ]);
 
@@ -350,5 +455,53 @@ export class DataService {
 
     deleteClass(id: number | string) {
         this.classes.update(c => c.filter(item => item.id !== id));
+    }
+
+    /** Public: register a user for a competition. Returns error string or null on success. */
+    registerForCompetition(competitionId: number | string, name: string, email: string): string | null {
+        const comp = this.competitions().find(c => c.id === competitionId);
+        if (!comp) return 'Competition not found.';
+
+        const already = (comp.participants ?? []).some(p => p.email.toLowerCase() === email.toLowerCase());
+        if (already) return 'This email is already registered for this competition.';
+
+        const max = comp.maxParticipants ?? Infinity;
+        if ((comp.participants ?? []).length >= max) return 'Sorry, registrations are closed — maximum capacity reached.';
+
+        if (comp.status === 'completed') return 'This competition has already ended.';
+
+        const newP: Participant = {
+            id: Date.now(), name, email,
+            registeredAt: new Date().toISOString().slice(0, 10),
+            status: 'registered'
+        };
+        const updated: Competition = { ...comp, participants: [...(comp.participants ?? []), newP] };
+        this.competitions.update(list => list.map(c => c.id === competitionId ? updated : c));
+        return null; // success
+    }
+
+    /** Public: enroll a user in a class. Returns error string or null on success. */
+    joinClass(classId: number | string, name: string, email: string): string | null {
+        const cls = this.classes().find(c => c.id === classId);
+        if (!cls) return 'Class not found.';
+
+        const already = (cls.enrolled ?? []).some(s => s.email.toLowerCase() === email.toLowerCase());
+        if (already) return 'You are already enrolled in this class.';
+
+        const max = cls.maxCapacity ?? Infinity;
+        if ((cls.enrolled ?? []).length >= max) return 'Sorry, this class is full.';
+
+        if (cls.status === 'cancelled') return 'This class has been cancelled.';
+
+        const student: EnrolledStudent = {
+            id: Date.now(), name, email,
+            enrolledAt: new Date().toISOString().slice(0, 10)
+        };
+        const newStatus: PlatformClass['status'] =
+            (cls.enrolled ?? []).length + 1 >= (cls.maxCapacity ?? Infinity) ? 'full' : cls.status;
+
+        const updated: PlatformClass = { ...cls, enrolled: [...(cls.enrolled ?? []), student], status: newStatus };
+        this.classes.update(list => list.map(c => c.id === classId ? updated : c));
+        return null; // success
     }
 }
